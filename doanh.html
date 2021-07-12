@@ -12,6 +12,42 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
     <title>DO AN CUOI KI DO HOA MAY</title>
+    <style>
+
+        .Graphic{
+            position: absolute;
+            top: 2.5rem;
+            right: 0rem;
+            }
+
+        .font {
+            background-color: #333;
+            font-family: Arial, Helvetica, sans-serif;
+            }
+        .font a {
+            float: left;
+            font-size: 18px;
+            color: white;
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+            }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            min-width: 100px;
+            background: gray;
+            z-index: 1;
+            }
+  
+        .dropdown-menu a{
+            color: black;
+            }
+  
+        .dropdown-menu a:hover{
+            background-color: #ffffff;
+            }
+            
+    </style>
 </head>
 
 <body>
@@ -22,17 +58,17 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown">Geometry</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#" onclick="SetGeometry(1);">Box</a>
-                        <a class="dropdown-item" href="#" onclick="SetGeometry(2);">Circle</a>
-                        <a class="dropdown-item" href="#" onclick="SetGeometry(3);">Sphere</a>
-                        <a class="dropdown-item" href="#" onclick="SetGeometry(4);">Cone</a>
-                        <a class="dropdown-item" href="#" onclick="SetGeometry(5);">Cylinder</a>
-                        <a class="dropdown-item" href="#" onclick="SetGeometry(6);">Torus</a>
-                        <a class="dropdown-item" href="#" onclick="SetGeometry(7);">TeaPot</a>
-                        <a class="dropdown-item" href="#" onclick="SetGeometry(8);">Bunny Lamp</a>
-                        <a class="dropdown-item" href="#" onclick="SetGeometry(9);">Diglett</a>
-                        <a class="dropdown-item" href="#" onclick="SetGeometry(10);">Straw Berry</a>
-                        <a class="dropdown-item" href="#" onclick="SetGeometry(11);">Totoro</a>
+                        <a class="dropdown-item" href="#" onclick="setGeometry(1);">Box</a>
+                        <a class="dropdown-item" href="#" onclick="setGeometry(2);">Circle</a>
+                        <a class="dropdown-item" href="#" onclick="setGeometry(3);">Sphere</a>
+                        <a class="dropdown-item" href="#" onclick="setGeometry(4);">Cone</a>
+                        <a class="dropdown-item" href="#" onclick="setGeometry(5);">Cylinder</a>
+                        <a class="dropdown-item" href="#" onclick="setGeometry(6);">Torus</a>
+                        <a class="dropdown-item" href="#" onclick="setGeometry(7);">TeaPot</a>
+                        <a class="dropdown-item" href="#" onclick="setGeometry(8);">Bunny Lamp</a>
+                        <a class="dropdown-item" href="#" onclick="setGeometry(9);">Diglett</a>
+                        <a class="dropdown-item" href="#" onclick="setGeometry(10);">Straw Berry</a>
+                        <a class="dropdown-item" href="#" onclick="setGeometry(11);">Totoro</a>
                     </div>
                 </li>
 
@@ -40,10 +76,10 @@
                     <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true">Surface</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#" onclick="SetSurface(1);">Point</a>
-                        <a class="dropdown-item" href="#" onclick="SetSurface(2);">Line</a>
-                        <a class="dropdown-item" href="#" onclick="SetSurface(3);">Solid</a>
-                        <a class="dropdown-item" href="#" onclick="SetSurface(4);">Add Texture</a>
+                        <a class="dropdown-item" href="#" onclick="setSurface(1);">Point</a>
+                        <a class="dropdown-item" href="#" onclick="setSurface(2);">Line</a>
+                        <a class="dropdown-item" href="#" onclick="setSurface(3);">Solid</a>
+                        <a class="dropdown-item" href="#" onclick="setSurface(4);">Add Texture</a>
                     </div>
                 </li>
 
@@ -51,11 +87,11 @@
                     <a class="nav-link" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
                         aria-haspopup="true" aria-expanded="true">Light</a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#" onclick="SetPointLight();">Point Light</a>
-                        <a class="dropdown-item" href="#" onclick="SetSpotLight();">Spot Light</a>
-                        <a class="dropdown-item" href="#" onclick="SetDirectionalLight();">Directional Light</a>
-                        <a class="dropdown-item" href="#" onclick="SetAmbientLight();">Ambient Light</a>
-                        <a class="dropdown-item" href="#" onclick="RemoveLight();">Remove Light</a>
+                        <a class="dropdown-item" href="#" onclick="setPointLight();">Point Light</a>
+                        <a class="dropdown-item" href="#" onclick="setSpotLight();">Spot Light</a>
+                        <a class="dropdown-item" href="#" onclick="setDirectionalLight();">Directional Light</a>
+                        <a class="dropdown-item" href="#" onclick="setAmbientLight();">Ambient Light</a>
+                        <a class="dropdown-item" href="#" onclick="removeLight();">Remove Light</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -64,16 +100,15 @@
                         Animation
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <a class="dropdown-item" href="#" onclick="SetAnimation(1);">Animation 1</a>
-                        <a class="dropdown-item" href="#" onclick="SetAnimation(2);">Animation 2</a>
-                        <a class="dropdown-item" href="#" onclick="SetAnimation(4);">Remove Animation</a>
+                        <a class="dropdown-item" href="#" onclick="setAnimation(1);">Animation 1</a>
+                        <a class="dropdown-item" href="#" onclick="setAnimation(2);">Animation 2</a>
+                        <a class="dropdown-item" href="#" onclick="setAnimation(4);">Remove Animation</a>
                     </div>
                 </li>
             </ul>
         </div>
     </nav>
-    <input id="file-input" type="file" name="file-input" style="display: none;" accept="image/*" />
-
+    <input id="path_image" type="file" style="display: none;">
     <br>
     <!-- <div  class = 'moveGUI'> </div> -->
     <div class="row" style="

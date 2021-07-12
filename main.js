@@ -1,27 +1,29 @@
 function init() {
-    //khởi tạo cảnh
     scene = new THREE.Scene();
 
-    //khởi tạo gui và đặt tên cho gui để đặt vị trí trong style.css
+    //Init interface
     gui = new dat.GUI({ autoPlace: false });
     $('.Graphic').append($(gui.domElement));
 
-
     //khởi tạo container cố định chứa vật thể và áp dụng các transformControls và animation
     //làm material của container trong suốt để thấy được vật thể bên trong
-    Container = GetSurface(GetGeometry('Box'), GetMaterial('Solid'), 'Solid');
+
+    //Init container to contain Object
+    Container = getSurface(getGeometry('Box'), getMaterial('Solid'), 'Solid');
     Container.material.transparent = true;
     Container.material.opacity = 0;
-    // Container.position.y = Contrainer.geometry.parameters.height/2
+
     // Tạo vật thể với tùy chọn hình dạng và bề mặt
-    var ObjectOne = GetSurface(GetGeometry('Box'), GetMaterial('Solid'), 'Solid');
+
+    //Init Object with Geometry and Surface
+    var ObjectOne = getSurface(getGeometry('Box'), getMaterial('Solid'), 'Solid');
     ObjectOne.name = "objectOne";
     ObjectOne.castShadow = true;
     Container.add(ObjectOne);
     scene.add(Container);
 
 
-    // Animations
+    // Create animation
     animation1 = anime.timeline({
         targets: Container.position,
         keyframes: [
@@ -66,16 +68,15 @@ function init() {
         ]
     }, 0);
 
-    // Tạo một lưới vuông với 4 tham số lần lượt là:
-    // kích thước của toàn lưới, độ chia nhỏ ô, màu của 2 đường trung tâm, màu lưới.
-
-    //tạo hình cầu
+    
+    //Create plane without light
     var plane1 = getPlane1(20);
     plane1.name = 'plane1';
     plane1.rotation.x = Math.PI / 2
     plane1.position.y = -ObjectOne.geometry.parameters.height / 2;
     scene.add(plane1)
 
+    //Create plan with light
     var plane = getPlane(20);
     plane.name = 'plane';
     plane.rotation.x = Math.PI / 2
@@ -83,35 +84,31 @@ function init() {
     plane.visible = false;
     scene.add(plane)
 
-    // var Sphere = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 12), GetMaterial('Solid'));
 
-    // tạo ánh sáng
-    var pointLight = GetPointLight(8);
+
+    // Create PointLight, SpotLight, DirectionalLight and AmbientLight.
+    var pointLight = getPointLight(8);
     pointLight.name = 'Pointlight';
     pointLight.visible = false;
-    // pointLight.add(Sphere);
     scene.add(pointLight);
 
     var SpotLight = getSpotLight(8);
     SpotLight.name = 'Spotlight';
     SpotLight.visible = false;
-    // SpotLight.add(Sphere);
     scene.add(SpotLight);
 
     var DirectionalLight = getDirectionalLight(8);
     DirectionalLight.name = 'Directionallight';
     DirectionalLight.visible = false;
-    // DirectionalLight.add(Sphere);
     scene.add(DirectionalLight);
 
 
     var AmbientLight = getAmbientLight(10);
     AmbientLight.name = 'Ambientlight';
     AmbientLight.visible = false;
-    // AmbientLight.add(Sphere);
     scene.add(AmbientLight);
 
-    //thêm điều khiển tọa độ và màu của ánh sáng.
+    //Add light controller for GUI
     PointlightGUI = gui.addFolder('PointLight');
     PointlightGUI.add(pointLight, 'intensity', 0, 20).name("intensity");
     PointlightGUI.add(pointLight.position, 'x', -10, 10);
@@ -158,20 +155,18 @@ function init() {
     DirectionalLightGUI.open();
     DirectionalLightGUI.hide();
 
-    // tạo Camera.
+    // Create camera and add camera controller for GUI
     var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 100);
     camera.position.set(0, 15, 20);
     camera.lookAt(new THREE.Vector3(0, 0, 0));
     scene.add(camera);
-
-    //thêm điều khiển camera
     var cameraGUI = gui.addFolder('Camera');
     cameraGUI.add(camera, 'fov', 1, 180).name("FOV");
     cameraGUI.add(camera, 'near', 0.1, 50).name("Near");
     cameraGUI.add(camera, 'far', 1, 100).name("Far");
     cameraGUI.open();
 
-    //cập nhật cửa sổ khi thu phóng
+    //Responsive windown web
     window.addEventListener('resize', function () {
         var width = window.innerWidth;
         var height = window.innerHeight;
@@ -179,30 +174,31 @@ function init() {
         camera.aspect = width / height;
         camera.updateProjectionMatrix();
     });
-    //tạo render
+
+    //Create render
     var renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
-    renderer.setClearColor('rgb(22, 27, 25)');
+    renderer.setClearColor('rgb(30, 30, 30)');
     document.getElementById('webgl').appendChild(renderer.domElement);
     renderer.render(scene, camera);
 
-    //kiểm soát camera bằng chuột
+    //Interactive camera by mouse
     var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
-    // Transform control, for using mouse for scale, rotation...
+    // Create transform controls
     transformControls = new THREE.TransformControls(camera, renderer.domElement);
     transformControls.addEventListener('dragging-changed', function (event) {
         controls.enabled = !event.value;
     });
 
-    transformControls.mode = 'translate'; // rotate & translate & scale are code at here.
-    transformControls.setMode('translate');	//"translate", "rotate" and "scale". Default is translate.
+    transformControls.mode = 'translate';
+    transformControls.setMode('translate');
     transformControls.attach(Container);
     scene.add(transformControls);
 
-    //thêm điều khiển TfMode
+    //Add transform controls for GUI
 
     var TfProperty = {
         Translate: function () { transformControls.mode = 'translate'; },
@@ -210,7 +206,6 @@ function init() {
         Scale: function () { transformControls.mode = 'scale'; },
         Reset: function () { ResetObject(); }
     };
-
     var TfMode = gui.addFolder('Transform Mode');
     TfMode.add(TfProperty, 'Translate');
     TfMode.add(TfProperty, 'Rotate');
@@ -218,13 +213,12 @@ function init() {
     TfMode.add(TfProperty, 'Reset');
     TfMode.open();
 
-    //gọi update để cập nhật liên tục animation
+    //Update frame  
     update(renderer, scene, camera, controls);
-
     ResetObject();
 }
 
-function GetPointLight(intensity) {
+function getPointLight(intensity) {
     var light = new THREE.PointLight(0xffffff, intensity);
     light.castShadow = true;
     light.position.x = 2;
@@ -271,7 +265,7 @@ function getDirectionalLight(intensity) {
 }
 
 function getAmbientLight(intensity) {
-    var light = new THREE.AmbientLight('rgb(10,30,50)', intensity);
+    var light = new THREE.AmbientLight('rgb(10,20,30)', intensity);
     light.position.x = 2;
     light.position.y = 5;
     light.position.z = 2;
@@ -296,7 +290,6 @@ function load3Dmodel(path, oldObj, x) {
 
 function getPlane(size) {
     var geometry = new THREE.PlaneGeometry(size, size);
-    // var material = new THREE.MeshPhongMaterial({ color: 'rgb(120,120,120)', side: THREE.DoubleSide });
     var material = new THREE.MeshPhongMaterial({ side: THREE.DoubleSide });
     var mesh = new THREE.Mesh(geometry, material);
     mesh.receiveShadow = true;
@@ -305,13 +298,12 @@ function getPlane(size) {
 
 function getPlane1(size) {
     var geometry = new THREE.PlaneGeometry(size, size);
-    var material = new THREE.MeshBasicMaterial({ color: 0xB00B69, side: THREE.DoubleSide });
+    var material = new THREE.MeshBasicMaterial({ color: 0x81A3DE, side: THREE.DoubleSide });
     var mesh = new THREE.Mesh(geometry, material);
-    // mesh.receiveShadow = true;
     return mesh
 }
 
-function GetGeometry(type) {
+function getGeometry(type) {
     var Geometry;
     switch (type) {
         case 'Box':
@@ -335,13 +327,11 @@ function GetGeometry(type) {
         case 'TeaPot':
             Geometry = new THREE.TeapotGeometry(0.5, 10);
             break;
-        case 'LatheGeometry':
-            break;
     }
     return Geometry;
 }
 
-function GetMaterial(type, url) {
+function getMaterial(type, url) {
     var textures;
     if (url) {
         textures = new THREE.TextureLoader().load(url);
@@ -352,24 +342,24 @@ function GetMaterial(type, url) {
     var selectedMaterial;
     switch (type) {
         case 'Line':
-            selectedMaterial = new THREE.LineBasicMaterial({ color: 'white' });
+            selectedMaterial = new THREE.LineBasicMaterial({color: 'white'});
             break;
         case 'Points':
-            selectedMaterial = new THREE.PointsMaterial({ size: 0.05, color: 'white' });
+            selectedMaterial = new THREE.PointsMaterial({size: 0.05, color: 'white'});
             break;
         case 'Solid':
-            selectedMaterial = new THREE.MeshBasicMaterial({ color: 'white', side: THREE.DoubleSide });
+            selectedMaterial = new THREE.MeshBasicMaterial({color: 'white', side: THREE.DoubleSide});
             break;
         case 'Texture':
-            selectedMaterial = new THREE.MeshBasicMaterial({ color: 'white', side: THREE.DoubleSide, map: textures });
+            selectedMaterial = new THREE.MeshBasicMaterial({color: 'white', side: THREE.DoubleSide, map: textures});
             break;
         default:
-            selectedMaterial = new THREE.MeshPhongMaterial({ color: 'white', side: THREE.DoubleSide });
+            selectedMaterial = new THREE.MeshPhongMaterial({color: 'white', side: THREE.DoubleSide});
     }
     return selectedMaterial;
 }
 
-function GetSurface(geometry, material, type) {
+function getSurface(geometry, material, type) {
     var Surface;
     switch (type) {
         case 'Line':
@@ -391,65 +381,59 @@ function GetSurface(geometry, material, type) {
 function update(renderer, scene, camera, controls) {
     renderer.render(scene, camera);
     controls.update();
-
     requestAnimationFrame(function () {
         camera.updateProjectionMatrix();
         update(renderer, scene, camera, controls);
-
     })
 }
 
-function SetGeometry(type) {
+function setGeometry(type) {
     var ObjectOne = Container.getObjectByName('objectOne');
     switch (type) {
         case 1:
-            ObjectOne.geometry = GetGeometry("Box");
-            // ObjectOne.position.y = ObjectOne.geometry.parameters.height / 2;
+            ObjectOne.geometry = getGeometry("Box");
             if (isModel) {
                 isModel = false;
                 loadNew3D();
             }
             break;
         case 2:
-            ObjectOne.geometry = GetGeometry("Circle");
+            ObjectOne.geometry = getGeometry("Circle");
             if (isModel) {
                 isModel = false;
                 loadNew3D();
             }
             break;
         case 3:
-            ObjectOne.geometry = GetGeometry("Sphere");
+            ObjectOne.geometry = getGeometry("Sphere");
             if (isModel) {
                 isModel = false;
                 loadNew3D();
             }
             break;
         case 4:
-            ObjectOne.geometry = GetGeometry("Cone");
-            // ObjectOne.position.y = ObjectOne.geometry.parameters.height / 2;
+            ObjectOne.geometry = getGeometry("Cone");
             if (isModel) {
                 isModel = false;
                 loadNew3D();
             }
             break;
         case 5:
-            ObjectOne.geometry = GetGeometry("Cylinder");
+            ObjectOne.geometry = getGeometry("Cylinder");
             if (isModel) {
                 isModel = false;
                 loadNew3D();
             }
             break;
         case 6:
-            ObjectOne.geometry = GetGeometry("Torus");
-            // ObjectOne.position.y = 2.5;
+            ObjectOne.geometry = getGeometry("Torus");
             if (isModel) {
                 isModel = false;
                 loadNew3D();
             }
             break;
         case 7:
-            ObjectOne.geometry = GetGeometry("TeaPot");
-            // ObjectOne.position.y = 0.5;
+            ObjectOne.geometry = getGeometry("TeaPot");
             if (isModel) {
                 isModel = false;
                 loadNew3D();
@@ -478,10 +462,14 @@ function SetGeometry(type) {
     };
 }
 
+var yPos = {
+    'BoxGeometry': 0,
+    'ConeGeometry': 0,
+};
+
 function loadNew3D(ObjectNew, ObjectOld) {
     if (isModel) {
         if (Container.getObjectByName('gltf') == undefined) {
-            //load hết thông số object cũ sang cái mới
             ObjectNew.position.copy(ObjectOld.position);
             ObjectNew.rotation.copy(ObjectOld.rotation);
             ObjectNew.scale.copy(ObjectOld.scale);
@@ -505,50 +493,45 @@ function loadNew3D(ObjectNew, ObjectOld) {
 }
 
 function loadNew(ObjectNew, ObjectOld) {
-    //load hết thông số object cũ sang cái mới
     ObjectNew.position.copy(ObjectOld.position);
     ObjectNew.rotation.copy(ObjectOld.rotation);
     ObjectNew.scale.copy(ObjectOld.scale);
     ObjectNew.name = ObjectOld.name;
     ObjectNew.castShadow = true;
 
-    //dọn sạch object cũ
     Container.remove(ObjectOld);
     ObjectOld.geometry.dispose();
     ObjectOld.material.dispose();
 
     Container.add(ObjectNew);
+    
 }
 
-function SetSurface(type) {
+function setSurface(type) {
     if (!isModel) {
         var ObjectOld = Container.getObjectByName('objectOne');
         var ObjectNew;
         var url;
         switch (type) {
             case 1:
-                ObjectNew = new THREE.Points(ObjectOld.geometry, GetMaterial('Points'));
+                ObjectNew = new THREE.Points(ObjectOld.geometry, getMaterial('Points'));
                 loadNew(ObjectNew, ObjectOld);
                 break;
             case 2:
-                ObjectNew = new THREE.Line(ObjectOld.geometry, GetMaterial("Line"));
+                ObjectNew = new THREE.Line(ObjectOld.geometry, getMaterial("Line"));
                 loadNew(ObjectNew, ObjectOld);
                 break;
             case 3:
-                ObjectNew = new THREE.Mesh(ObjectOld.geometry, GetMaterial('Solid'));
+                ObjectNew = new THREE.Mesh(ObjectOld.geometry, getMaterial('Solid'));
                 loadNew(ObjectNew, ObjectOld);
                 break;
             case 4:
-                var input = document.getElementById('file-input');
+                var input = document.getElementById('path_image');
                 input.onchange = e => {
-                    // getting a hold of the file reference
                     var file = e.target.files[0];
-
                     const reader = new FileReader();
-
                     reader.addEventListener("load", function () {
-                        // convert image file to base64 string
-                        ObjectNew = new THREE.Mesh(ObjectOld.geometry, GetMaterial("Texture", reader.result));
+                        ObjectNew = new THREE.Mesh(ObjectOld.geometry, getMaterial("Texture", reader.result));
                         loadNew(ObjectNew, ObjectOld);
                     }, false);
 
@@ -562,120 +545,97 @@ function SetSurface(type) {
     }
 }
 
-
-function SetPointLight() {
+function setPointLight() {
     SpotlightGUI.hide();
     DirectionalLightGUI.hide();
     AmbientLightGUI.hide();
     PointlightGUI.show();
 
-    //hiển thị ánh sáng
     scene.getObjectByName('Spotlight').visible = false;
     scene.getObjectByName('Directionallight').visible = false;
     scene.getObjectByName('Ambientlight').visible = false;
     scene.getObjectByName('Pointlight').visible = true;
 
-    //thay đổi lại material của object thành Phong để không tự phát sáng như basic
-    // var myMaterials = [Container.getObjectByName('objectOne').material, GetMaterial("Phong")];
-    // var myMesh = new THREE.Mesh(Container.getObjectByName('objectOne').geometry, myMaterials);
-    // Container.getObjectByName('objectOne').material = myMaterials;
-    Container.getObjectByName('objectOne').material = GetMaterial("Phong");
-
-    //hiển thị nền để tạo shadow
     scene.getObjectByName('plane1').visible = false;
     scene.getObjectByName('plane').visible = true;
 
 }
-function SetSpotLight() {
+
+function setSpotLight() {
     PointlightGUI.hide();
     DirectionalLightGUI.hide();
     AmbientLightGUI.hide();
     SpotlightGUI.show();
 
-    //hiển thị ánh sáng
     scene.getObjectByName('Pointlight').visible = false;
     scene.getObjectByName('Directionallight').visible = false;
     scene.getObjectByName('Ambientlight').visible = false;
     scene.getObjectByName('Spotlight').visible = true;
 
-    //thay đổi lại material của object thành Phong để không tự phát sáng như basic
-    Container.getObjectByName('objectOne').material = GetMaterial("Phong");
-
-    //hiển thị nền để tạo shadow
     scene.getObjectByName('plane1').visible = false;
     scene.getObjectByName('plane').visible = true;
 
 }
 
-function SetDirectionalLight() {
+function setDirectionalLight() {
     PointlightGUI.hide();
     SpotlightGUI.hide();
     AmbientLightGUI.hide();
     DirectionalLightGUI.show();
-    //hiển thị ánh sáng
+
     scene.getObjectByName('Pointlight').visible = false;
     scene.getObjectByName('Spotlight').visible = false;
     scene.getObjectByName('Ambientlight').visible = false;
     scene.getObjectByName('Directionallight').visible = true;
-    //thay đổi lại material của object thành Phong để không tự phát sáng như basic
-    Container.getObjectByName('objectOne').material = GetMaterial("Phong");
 
-    //hiển thị nền để tạo shadow
     scene.getObjectByName('plane1').visible = false;
     scene.getObjectByName('plane').visible = true;
 
 }
 
-function SetAmbientLight() {
+function setAmbientLight() {
     PointlightGUI.hide();
     SpotlightGUI.hide();
     DirectionalLightGUI.hide();
     AmbientLightGUI.show();
-    //hiển thị ánh sáng
+
     scene.getObjectByName('Pointlight').visible = false;
     scene.getObjectByName('Spotlight').visible = false;
     scene.getObjectByName('Directionallight').visible = false;
     scene.getObjectByName('Ambientlight').visible = true;
-    //thay đổi lại material của object thành Phong để không tự phát sáng như basic
-    Container.getObjectByName('objectOne').material = GetMaterial("Phong");
 
-    //hiển thị nền để tạo shadow
     scene.getObjectByName('plane1').visible = false;
     scene.getObjectByName('plane').visible = true;
 
 }
 
-function RemoveLight() {
+function removeLight() {
     PointlightGUI.hide();
     SpotlightGUI.hide();
     DirectionalLightGUI.hide();
     AmbientLightGUI.hide();
-    //tắt ánh sáng
+
     scene.getObjectByName('Pointlight').visible = false;
     scene.getObjectByName('Spotlight').visible = false;
     scene.getObjectByName('Directionallight').visible = false;
     scene.getObjectByName('Ambientlight').visible = false;
-    //thay đổi lại material của object thành basic để tự phát
-    Container.getObjectByName('objectOne').material = GetMaterial("Solid");
 
-    //ẩn nền
     scene.getObjectByName('plane').visible = false;
     scene.getObjectByName('plane1').visible = true;
+
 }
 
-function SetAnimation(type) {
+function setAnimation(type) {
     switch (type) {
         case 1:
             transformControls.visible = false;
-            // animation2.pause();
-            // animation3.pause();
+
             animation1.play();
             break;
         case 2:
             transformControls.visible = false;
             animation2.play();
             animation1.pause();
-            // animation3.pause();
             break;
         case 3:
             transformControls.visible = false;
@@ -689,7 +649,6 @@ function SetAnimation(type) {
             transformControls.visible = true;
             animation1.pause();
             animation2.pause();
-            // animation3.pause();
             break;
     }
 }
@@ -698,6 +657,7 @@ function ResetObject() {
     Container.position.set(0, 0, 0);
     Container.rotation.set(0, 0, 0);
     Container.scale.set(1, 1, 1);
+
 }
 
 var scene, Container, transformControls, lightGUI;
